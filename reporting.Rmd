@@ -9,16 +9,45 @@ output:
 
 ```{r setup, include=FALSE}
 require(data.table)
+require(rAmCharts)
 knitr::opts_chunk$set(echo = TRUE)
-dt = data.table::fread('data.csv')
+data = data.table::fread('data.csv')
+data$Price = 8*(data$Asp.Bl+data$Asp.V) + 3*data$Fraise
+data$Jour = as.Date(data$Jour)
+data$Week = strftime(data$Jour, format = "%V")
 ```
 
-## R Markdown
+## La commande typique
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+### Le panier moyen de la saison en cours
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+Si on regarde quelques commandes, on peut déterminer à quoi ressemble la commande la plus classique, la commande moyenne. Ce panier moyen permet de voir ce que les internautes préfèrent commander. Cela peut permettre aussi d'affiner le stock, ou de voir si les bazochois sont plus ou moins gourmands par rapport à une autre date.
 
-```{r cars}
-summary(dt)
+```{r cars, echo=FALSE, include=FALSE}
+basket_mean = lapply(data[,.(Asp.Bl, Asp.V, Fraise, Price)], mean)
+if(basket_mean$Fraise<1){
+  fraise_mean = paste(basket_mean$Fraise*250, "grammes")
+} else {
+  fraise_mean = paste(basket_mean$Fraise/4, "kilos")
+}
 ```
+
+|    |      |    |
+| :------------- | :----------: | -----------: |
+| <img src="https://champ-ramard.fr/assets/images/logo.svg" width="40px"> | Asperges blanches |  `r basket_mean$Asp.Bl` kilos | 
+| <img src="https://champ-ramard.fr/assets/images/logo.svg" width="40px">  | Asperges vertes   |  `r basket_mean$Asp.V` kilos |   
+| <img src="https://champ-ramard.fr/assets/images/strawberry.svg" width="40px">  | Fraise            |  `r fraise_mean`|
+| Prix de la commande moyenne  |            |  **`r basket_mean$Price`€**|
+
+### Evolution hebdomadaire du panier moyen 
+
+Suivre dans le temps ce panier typique permet de juger de l'envie d'asperges ou de fraises semaine après semaine.
+
+```{r}
+get_basket_mean <- function (x){lapply(x[,.(Asp.Bl, Asp.V, Fraise, Price)], mean)}
+data[,get_basket_mean(.SD), by=Week]
+```
+
+
+
+
