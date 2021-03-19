@@ -15,7 +15,17 @@ data = data.table::fread('data.csv')
 data$Price = 8*(data$Asp.Bl+data$Asp.V) + 3*data$Fraise
 data$Jour = as.Date(data$Jour)
 data$Week = strftime(data$Jour, format = "%V")
+data$WeekDay = weekdays(data$Jour)
 ```
+
+## La semaine typique 
+
+```{r, echo=FALSE}
+data_pie = data.frame(table(data$WeekDay))
+colnames(data_pie) = c('label', 'value')
+rAmCharts::amPie(data_pie, main="Répartition des commandes dans la semaine")
+```
+
 
 ## La commande typique
 
