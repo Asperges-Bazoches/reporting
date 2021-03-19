@@ -11,7 +11,17 @@ output:
 require(data.table)
 knitr::opts_chunk$set(echo = TRUE)
 dt = data.table::fread('data.csv')
+dt$WeekDay = weekdays(dt$Jour)
 ```
+
+```{r, echo=FALSE}
+data_pie = data.frame(table(dt$WeekDay))
+colnames(data_pie) = c('label', 'value')
+rAmCharts::amPie(data_pie, main="Répartition des commandes dans la semaine")
+```
+
+
+
 
 ## R Markdown
 

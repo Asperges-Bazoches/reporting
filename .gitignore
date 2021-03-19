@@ -4,3 +4,5 @@ data.csv
 *.Rproj
 .Rproj.user
 reporting.html
+.RData
+.Rhistory
